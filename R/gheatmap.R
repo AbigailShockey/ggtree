@@ -10,14 +10,17 @@
 ##' @param high color of highest value
 ##' @param color color of heatmap cell border
 ##' @param colnames logical, add matrix colnames or not
+##' @param rownames logical, add matrix rownames or not
 ##' @param colnames_position one of 'bottom' or 'top'
 ##' @param colnames_angle angle of column names
-##' @param colnames_level levels of colnames
-##' @param rownames_offset x offset for column names
-##' @param colnames_offset y offset for column names
-##' @param font.size font size of matrix colnames
-##' @param hjust hjust for column names (0: align left, 0.5: align center, 1: align righ)
+##' @param rownames_angle angle of row names
+##' @param offset_x x offset for matrix row and colnames
+##' @param offset_y y offset for matrix row and colnames
+##' @param font.size font size of matrix row and colnames
+##' @param hjust hjust for matrix row and colnames (0: align left, 0.5: align center, 1: align right)
 ##' @param legend_title title of fill legend
+##' @param cell_labels logical, add matrix cell labels or not
+##' @param cell_font_size logical, font size of matrix cell labels
 ##' @return tree view
 ##' @importFrom ggplot2 geom_tile
 ##' @importFrom ggplot2 geom_text
@@ -35,7 +38,7 @@
 gheatmap <- function(p, data, offset = 0, width = 1, low = "green", high = "blue", color = "white",colnames = TRUE,
                      colnames_position = "bottom", colnames_angle = 90, rownames_angle = 0, colnames_level = NULL,
                      rownames_offset = 0, colnames_offset = 0, font.size = 2, hjust = 0.5, legend_title = "value",
-                     cell_labels = TRUE, cell_text_size = 2, y_axis_labels = TRUE) {
+                     cell_labels = TRUE, cell_font_size = 2, rownames = TRUE) {
   colnames_position %<>% match.arg(c("bottom", "top"))
   variable <- value <- lab <- y <- NULL
 
@@ -116,7 +119,7 @@ gheatmap <- function(p, data, offset = 0, width = 1, low = "green", high = "blue
     dd$clr[which(dd$value < mean(dd$value, na.rm = T) & dd$value > 0)] <- "white"
     dd$clr[which(dd$value > (max(dd$value)/2))] <- "black"
     dd$clr[which(dd$value  ==  0)] <- "black"
-    p2 <- p2 + geom_text(data = dd, aes(label = value,color = factor(clr)), size = cell_text_size) +
+    p2 <- p2 + geom_text(data = dd, aes(label = value,color = factor(clr)), size = cell_font_size) +
       scale_color_manual(values = c("black", "white"), guide = FALSE)
   }
   if (colnames) {
@@ -128,7 +131,7 @@ gheatmap <- function(p, data, offset = 0, width = 1, low = "green", high = "blue
     mapping$y <- y
     mapping[[".panel"]] <- factor("Tree")
   }
-  if (isTRUE(y_axis_labels)) {
+  if (isTRUE(rownames)) {
     ystart <- 0
     V3 <- ystart + as.numeric(dd$variable) * 1
     ymapping <- data.frame(from = dd$variable, to = V3)
@@ -136,14 +139,14 @@ gheatmap <- function(p, data, offset = 0, width = 1, low = "green", high = "blue
     ymapping$x <- min(dd$x) - max(df$x)
     ymapping[[".panel"]] <- factor("Tree")
     p2 <- p2 + geom_text(data = mapping, aes(x = to, y = y, label = from), size = font.size, inherit.aes = FALSE,
-                         angle = rownames_angle, nudge_x = rownames_offset, nudge_y = colnames_offset,
+                         angle = colnames_angle, nudge_x = offset_x, nudge_y = offset_y,
                          hjust = hjust, vjust  = 1) +
       geom_text(data = ymapping, aes(x = x, y = to, label = from), size = font.size, inherit.aes = FALSE,
-                angle = colnames_angle, nudge_x = rownames_offset, nudge_y = colnames_offset, hjust = hjust)
+                angle = rownames_angle, nudge_x = offset_x, nudge_y = offset_y, hjust = hjust)
   }
   else {
     p2 <- p2 + geom_text(data = mapping, aes(x = to, y = y, label = from), size = font.size, inherit.aes = FALSE,
-                         angle = rownames_angle, nudge_x = rownames_offset, nudge_y = colnames_offset,
+                         angle = colnames_angle, nudge_x = offset_x, nudge_y = offset_y,
                          hjust = hjust, vjust  = 1)
   }
   p2 <- p2 + theme(legend.position = "right")
