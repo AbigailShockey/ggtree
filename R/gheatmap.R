@@ -13,8 +13,8 @@
 ##' @param colnames_position one of 'bottom' or 'top'
 ##' @param colnames_angle angle of column names
 ##' @param colnames_level levels of colnames
-##' @param colnames_offset_x x offset for column names
-##' @param colnames_offset_y y offset for column names
+##' @param rownames_offset x offset for column names
+##' @param colnames_offset y offset for column names
 ##' @param font.size font size of matrix colnames
 ##' @param hjust hjust for column names (0: align left, 0.5: align center, 1: align righ)
 ##' @param legend_title title of fill legend
@@ -32,107 +32,126 @@
 ##' @importFrom dplyr select
 ##' @export
 ##' @author Guangchuang Yu
-gheatmap <- function(p, data, offset=0, width=1, low="green", high="red", color="white",
-                     colnames=TRUE, colnames_position="bottom", colnames_angle=0, colnames_level=NULL,
-                     colnames_offset_x = 0, colnames_offset_y = 0, font.size=4, hjust=0.5, legend_title = "value") {
+gheatmap <- function(p, data, offset = 0, width = 1, low = "green", high = "blue", color = "white",colnames = TRUE,
+                     colnames_position = "bottom", colnames_angle = 90, rownames_angle = 0, colnames_level = NULL,
+                     rownames_offset = 0, colnames_offset = 0, font.size = 2, hjust = 0.5, legend_title = "value",
+                     cell_labels = TRUE, cell_text_size = 2, y_axis_labels = TRUE) {
+  colnames_position %<>% match.arg(c("bottom", "top"))
+  variable <- value <- lab <- y <- NULL
 
-    colnames_position %<>% match.arg(c("bottom", "top"))
-    variable <- value <- lab <- y <- NULL
+  ## if (is.null(width)) {
+  ##     width <- (p$data$x %>% range %>% diff)/30
+  ## }
 
-    ## if (is.null(width)) {
-    ##     width <- (p$data$x %>% range %>% diff)/30
-    ## }
+  ## convert width to width of each cell
+  width <- width * (p$data$x %>% range(na.rm = TRUE) %>% diff) / ncol(data)
+  isTip <- x <- y <- variable <- value <- from <- to <- NULL
 
-    ## convert width to width of each cell
-    width <- width * (p$data$x %>% range(na.rm=TRUE) %>% diff) / ncol(data)
+  ## handle the display of heatmap on collapsed nodes
+  ## https://github.com/GuangchuangYu/ggtree/issues/242
+  ## extract data on leaves (& on collapsed internal nodes)
+  ## (the latter is extracted only when the input data has data on collapsed
+  ## internal nodes)
+  df <- p$data
+  nodeCo <- intersect(df %>% filter(is.na(x)) %>%
+                        select(.data$parent, .data$node) %>% unlist(),
+                      df %>% filter(!is.na(x)) %>%
+                        select(.data$parent, .data$node) %>% unlist())
+  labCo <- df %>% filter(.data$node %in% nodeCo) %>%
+    select(.data$label) %>% unlist()
+  selCo <- intersect(labCo, rownames(data))
+  isSel <- df$label %in% selCo
 
-    isTip <- x <- y <- variable <- value <- from <- to <- NULL
+  df <- df[df$isTip | isSel, ]
+  start <- max(df$x, na.rm = TRUE) + offset
 
-    ## handle the display of heatmap on collapsed nodes
-    ## https://github.com/GuangchuangYu/ggtree/issues/242
-    ## extract data on leaves (& on collapsed internal nodes) 
-    ## (the latter is extracted only when the input data has data on collapsed
-    ## internal nodes)
-    df <- p$data
-    nodeCo <- intersect(df %>% filter(is.na(x)) %>% 
-                         select(.data$parent, .data$node) %>% unlist(), 
-                     df %>% filter(!is.na(x)) %>% 
-                         select(.data$parent, .data$node) %>% unlist())
-    labCo <- df %>% filter(.data$node %in% nodeCo) %>% 
-        select(.data$label) %>% unlist()
-    selCo <- intersect(labCo, rownames(data))
-    isSel <- df$label %in% selCo
-    
-    df <- df[df$isTip | isSel, ]
-    start <- max(df$x, na.rm=TRUE) + offset
+  dd <- as.data.frame(data)
 
-    dd <- as.data.frame(data)
-    ## dd$lab <- rownames(dd)
-    i <- order(df$y)
+  ## dd$lab <- rownames(dd)
+  i <- order(df$y)
 
-    ## handle collapsed tree
-    ## https://github.com/GuangchuangYu/ggtree/issues/137
-    i <- i[!is.na(df$y[i])]
+  ## handle collapsed tree
+  ## https://github.com/GuangchuangYu/ggtree/issues/137
+  i <- i[!is.na(df$y[i])]
+  lab <- df$label[i]
 
-    lab <- df$label[i]
-    ## dd <- dd[lab, , drop=FALSE]
-    ## https://github.com/GuangchuangYu/ggtree/issues/182
-    dd <- dd[match(lab, rownames(dd)), , drop = FALSE]
+  ## dd <- dd[lab, , drop = FALSE]
+  ## https://github.com/GuangchuangYu/ggtree/issues/182
+  dd <- dd[match(lab, rownames(dd)), , drop = FALSE]
+  dd$y <- sort(df$y)
+  dd$lab <- lab
 
+  ## dd <- melt(dd, id = c("lab", "y"))
+  dd <- gather(dd, variable, value, -c(lab, y))
 
-    dd$y <- sort(df$y)
-    dd$lab <- lab
-    ## dd <- melt(dd, id=c("lab", "y"))
-    dd <- gather(dd, variable, value, -c(lab, y))
+  i <- which(dd$value  ==  "")
+  if (length(i) > 0) {
+    dd$value[i] <- NA
+  }
+  if (is.null(colnames_level)) {
+    dd$variable <- factor(dd$variable, levels = colnames(data))
+  } else {
+    dd$variable <- factor(dd$variable, levels = colnames_level)
+  }
 
-    i <- which(dd$value == "")
-    if (length(i) > 0) {
-        dd$value[i] <- NA
-    }
-    if (is.null(colnames_level)) {
-        dd$variable <- factor(dd$variable, levels=colnames(data))
+  V2 <- start + as.numeric(dd$variable) * width
+  mapping <- data.frame(from = dd$variable, to = V2)
+  mapping <- unique(mapping)
+  dd$x <- V2
+  dd$width <- width
+  dd[[".panel"]] <- factor("Tree")
+
+  if (is.null(color)) {
+    p2 <- p + geom_tile(data = dd, aes(x, y, fill = value), width = width, inherit.aes = FALSE)
+  } else {
+    p2 <- p + geom_tile(data = dd, aes(x, y, fill = value), width = width, color = color, inherit.aes = FALSE)
+  }
+  if (is(dd$value,"numeric")) {
+    p2 <- p2 + scale_fill_gradient(low = low, high = high, na.value = NA, name = legend_title) # "white")
+  } else {
+    p2 <- p2 + scale_fill_discrete(na.value = NA, name = legend_title) #"white")
+  }
+  if (is(dd$value,"numeric") & isTRUE(cell_labels)) {
+    dd$clr <- NA
+    dd$clr[which(dd$value < mean(dd$value, na.rm = T) & dd$value > 0)] <- "white"
+    dd$clr[which(dd$value > (max(dd$value)/2))] <- "black"
+    dd$clr[which(dd$value  ==  0)] <- "black"
+    p2 <- p2 + geom_text(data = dd, aes(label = value,color = factor(clr)), size = cell_text_size) +
+      scale_color_manual(values = c("black", "white"), guide = FALSE)
+  }
+  if (colnames) {
+    if (colnames_position  ==  "bottom") {
+      y <- 0
     } else {
-        dd$variable <- factor(dd$variable, levels=colnames_level)
+      y <- max(p$data$y) + 1
     }
-    V2 <- start + as.numeric(dd$variable) * width
-    mapping <- data.frame(from=dd$variable, to=V2)
-    mapping <- unique(mapping)
-
-    dd$x <- V2
-    dd$width <- width
-    dd[[".panel"]] <- factor("Tree")
-    if (is.null(color)) {
-        p2 <- p + geom_tile(data=dd, aes(x, y, fill=value), width=width, inherit.aes=FALSE)
-    } else {
-        p2 <- p + geom_tile(data=dd, aes(x, y, fill=value), width=width, color=color, inherit.aes=FALSE)
-    }
-    if (is(dd$value,"numeric")) {
-        p2 <- p2 + scale_fill_gradient(low=low, high=high, na.value=NA, name = legend_title) # "white")
-    } else {
-        p2 <- p2 + scale_fill_discrete(na.value=NA, name = legend_title) #"white")
-    }
-
-    if (colnames) {
-        if (colnames_position == "bottom") {
-            y <- 0
-        } else {
-            y <- max(p$data$y) + 1
-        }
-        mapping$y <- y
-        mapping[[".panel"]] <- factor("Tree")
-        p2 <- p2 + geom_text(data=mapping, aes(x=to, y = y, label=from), size=font.size, inherit.aes = FALSE,
-                             angle=colnames_angle, nudge_x=colnames_offset_x, nudge_y = colnames_offset_y, hjust=hjust)
-    }
-
-    p2 <- p2 + theme(legend.position="right")
-    ## p2 <- p2 + guides(fill = guide_legend(override.aes = list(colour = NULL)))
-
-    if (!colnames) {
-        ## https://github.com/GuangchuangYu/ggtree/issues/204
-        p2 <- p2 + scale_y_continuous(expand = c(0,0))
-    }
-
-    attr(p2, "mapping") <- mapping
-    return(p2)
+    mapping$y <- y
+    mapping[[".panel"]] <- factor("Tree")
+  }
+  if (isTRUE(y_axis_labels)) {
+    ystart <- 0
+    V3 <- ystart + as.numeric(dd$variable) * 1
+    ymapping <- data.frame(from = dd$variable, to = V3)
+    ymapping <- unique(ymapping)
+    ymapping$x <- min(dd$x) - max(df$x)
+    ymapping[[".panel"]] <- factor("Tree")
+    p2 <- p2 + geom_text(data = mapping, aes(x = to, y = y, label = from), size = font.size, inherit.aes = FALSE,
+                         angle = rownames_angle, nudge_x = rownames_offset, nudge_y = colnames_offset,
+                         hjust = hjust, vjust  = 1) +
+      geom_text(data = ymapping, aes(x = x, y = to, label = from), size = font.size, inherit.aes = FALSE,
+                angle = colnames_angle, nudge_x = rownames_offset, nudge_y = colnames_offset, hjust = hjust)
+  }
+  else {
+    p2 <- p2 + geom_text(data = mapping, aes(x = to, y = y, label = from), size = font.size, inherit.aes = FALSE,
+                         angle = rownames_angle, nudge_x = rownames_offset, nudge_y = colnames_offset,
+                         hjust = hjust, vjust  = 1)
+  }
+  p2 <- p2 + theme(legend.position = "right")
+  ## p2 <- p2 + guides(fill = guide_legend(override.aes = list(colour = NULL)))
+  if (!colnames) {
+    ## https://github.com/GuangchuangYu/ggtree/issues/204
+    p2 <- p2 + scale_y_continuous(expand = c(0,0))
+  }
+  attr(p2, "mapping") <- mapping
+  return(p2)
 }
-
