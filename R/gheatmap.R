@@ -37,8 +37,9 @@
 ##' @author Guangchuang Yu
 gheatmap <- function(p, data, offset = 0, width = 1, low = "green", high = "blue", color = "white",colnames = TRUE,
                      colnames_position = "bottom", colnames_angle = 90, rownames_angle = 0, colnames_level = NULL,
-                     rownames_offset = 0, offset_x = 0, offset_y = 0, font.size = 2, hjust = 0.5, legend_title = "value",
+                     offset_x = 0, offset_y = 0, font.size = 2, hjust = 0.5, legend_title = "value",
                      cell_labels = TRUE, cell_font_size = 2, rownames = TRUE) {
+
   colnames_position %<>% match.arg(c("bottom", "top"))
   variable <- value <- lab <- y <- NULL
 
