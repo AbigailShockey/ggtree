@@ -14,8 +14,10 @@
 ##' @param colnames_position one of 'bottom' or 'top'
 ##' @param colnames_angle angle of column names
 ##' @param rownames_angle angle of row names
-##' @param offset_x x offset for matrix row and colnames
-##' @param offset_y y offset for matrix row and colnames
+##' @param offset_x x nudge for matrix row and colnames
+##' @param offset_y y nudge for matrix row and colnames
+##' @param colnames_offset colnames offset from matrix
+##' @param rownames_offset rownames offset from matrix
 ##' @param font.size font size of matrix row and colnames
 ##' @param hjust hjust for matrix row and colnames (0: align left, 0.5: align center, 1: align right)
 ##' @param legend_title title of fill legend
@@ -37,8 +39,8 @@
 ##' @author Guangchuang Yu
 gheatmap <- function(p, data, offset = 0, width = 1, low = "green", high = "blue", color = "white",colnames = TRUE,
                      colnames_position = "bottom", colnames_angle = 90, rownames_angle = 0, colnames_level = NULL,
-                     offset_x = 0, offset_y = 0, font.size = 2, hjust = 0.5, legend_title = "value",
-                     cell_labels = TRUE, cell_font_size = 2, rownames = TRUE) {
+                     rownames_offset = 0, colnames_offset = 0, offset_x = 0, offset_y = 0, font.size = 2, hjust = 0.5,
+                     legend_title = "value", cell_labels = TRUE, cell_font_size = 2, rownames = TRUE) {
 
   colnames_position %<>% match.arg(c("bottom", "top"))
   variable <- value <- lab <- y <- NULL
@@ -125,7 +127,7 @@ gheatmap <- function(p, data, offset = 0, width = 1, low = "green", high = "blue
   }
   if (colnames) {
     if (colnames_position  ==  "bottom") {
-      y <- 0
+      y <- colnames_offset
     } else {
       y <- max(p$data$y) + 1
     }
@@ -137,7 +139,7 @@ gheatmap <- function(p, data, offset = 0, width = 1, low = "green", high = "blue
     V3 <- ystart + as.numeric(dd$variable) * 1
     ymapping <- data.frame(from = dd$variable, to = V3)
     ymapping <- unique(ymapping)
-    ymapping$x <- min(dd$x) - max(df$x)
+    ymapping$x <- (min(dd$x) - max(df$x)) + rownames_offset
     ymapping[[".panel"]] <- factor("Tree")
     p2 <- p2 + geom_text(data = mapping, aes(x = to, y = y, label = from), size = font.size, inherit.aes = FALSE,
                          angle = colnames_angle, nudge_x = offset_x, nudge_y = offset_y,
