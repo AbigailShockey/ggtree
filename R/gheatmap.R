@@ -19,7 +19,6 @@
 ##' @param colnames_offset colnames offset from matrix
 ##' @param rownames_offset rownames offset from matrix
 ##' @param font.size font size of matrix row and colnames
-##' @param hjust hjust for matrix row and colnames (0: align left, 0.5: align center, 1: align right)
 ##' @param legend_title title of fill legend
 ##' @param cell_labels logical, add matrix cell labels or not
 ##' @param cell_font_size logical, font size of matrix cell labels
@@ -39,20 +38,20 @@
 ##' @author Guangchuang Yu
 gheatmap <- function(p, data, offset = 0, width = 1, low = "green", high = "blue", color = "white",colnames = TRUE,
                      colnames_position = "bottom", colnames_angle = 90, rownames_angle = 0, colnames_level = NULL,
-                     rownames_offset = 0, colnames_offset = 0, offset_x = 0, offset_y = 0, font.size = 2, hjust = 0.5,
+                     rownames_offset = 0, colnames_offset = 0, offset_x = 0, offset_y = 0, font.size = 2,
                      legend_title = "value", cell_labels = TRUE, cell_font_size = 2, rownames = TRUE) {
 
   colnames_position %<>% match.arg(c("bottom", "top"))
   variable <- value <- lab <- y <- NULL
-
+  
   ## if (is.null(width)) {
   ##     width <- (p$data$x %>% range %>% diff)/30
   ## }
-
+  
   ## convert width to width of each cell
   width <- width * (p$data$x %>% range(na.rm = TRUE) %>% diff) / ncol(data)
   isTip <- x <- y <- variable <- value <- from <- to <- NULL
-
+  
   ## handle the display of heatmap on collapsed nodes
   ## https://github.com/GuangchuangYu/ggtree/issues/242
   ## extract data on leaves (& on collapsed internal nodes)
@@ -67,29 +66,29 @@ gheatmap <- function(p, data, offset = 0, width = 1, low = "green", high = "blue
     select(.data$label) %>% unlist()
   selCo <- intersect(labCo, rownames(data))
   isSel <- df$label %in% selCo
-
+  
   df <- df[df$isTip | isSel, ]
   start <- max(df$x, na.rm = TRUE) + offset
-
+  
   dd <- as.data.frame(data)
-
+  
   ## dd$lab <- rownames(dd)
   i <- order(df$y)
-
+  
   ## handle collapsed tree
   ## https://github.com/GuangchuangYu/ggtree/issues/137
   i <- i[!is.na(df$y[i])]
   lab <- df$label[i]
-
+  
   ## dd <- dd[lab, , drop = FALSE]
   ## https://github.com/GuangchuangYu/ggtree/issues/182
   dd <- dd[match(lab, rownames(dd)), , drop = FALSE]
   dd$y <- sort(df$y)
   dd$lab <- lab
-
+  
   ## dd <- melt(dd, id = c("lab", "y"))
   dd <- gather(dd, variable, value, -c(lab, y))
-
+  
   i <- which(dd$value  ==  "")
   if (length(i) > 0) {
     dd$value[i] <- NA
@@ -99,14 +98,14 @@ gheatmap <- function(p, data, offset = 0, width = 1, low = "green", high = "blue
   } else {
     dd$variable <- factor(dd$variable, levels = colnames_level)
   }
-
+  
   V2 <- start + as.numeric(dd$variable) * width
   mapping <- data.frame(from = dd$variable, to = V2)
   mapping <- unique(mapping)
   dd$x <- V2
   dd$width <- width
   dd[[".panel"]] <- factor("Tree")
-
+  
   if (is.null(color)) {
     p2 <- p + geom_tile(data = dd, aes(x, y, fill = value), width = width, inherit.aes = FALSE)
   } else {
@@ -139,18 +138,18 @@ gheatmap <- function(p, data, offset = 0, width = 1, low = "green", high = "blue
     V3 <- ystart + as.numeric(dd$variable) * 1
     ymapping <- data.frame(from = dd$variable, to = V3)
     ymapping <- unique(ymapping)
-    ymapping$x <- (min(dd$x) - max(df$x)) + rownames_offset
+    ymapping$x <- start + rownames_offset
     ymapping[[".panel"]] <- factor("Tree")
     p2 <- p2 + geom_text(data = mapping, aes(x = to, y = y, label = from), size = font.size, inherit.aes = FALSE,
                          angle = colnames_angle, nudge_x = offset_x, nudge_y = offset_y,
-                         hjust = hjust, vjust  = 1) +
+                         hjust = 0.5, vjust  = 1) +
       geom_text(data = ymapping, aes(x = x, y = to, label = from), size = font.size, inherit.aes = FALSE,
-                angle = rownames_angle, nudge_x = offset_x, nudge_y = offset_y, hjust = hjust)
+                angle = rownames_angle, nudge_x = offset_x, nudge_y = offset_y, hjust = 0, vjust = 0.5)
   }
   else {
     p2 <- p2 + geom_text(data = mapping, aes(x = to, y = y, label = from), size = font.size, inherit.aes = FALSE,
                          angle = colnames_angle, nudge_x = offset_x, nudge_y = offset_y,
-                         hjust = hjust, vjust  = 1)
+                         hjust = 0.5, vjust  = 1)
   }
   p2 <- p2 + theme(legend.position = "right")
   ## p2 <- p2 + guides(fill = guide_legend(override.aes = list(colour = NULL)))
