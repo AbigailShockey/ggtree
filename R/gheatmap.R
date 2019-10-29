@@ -142,14 +142,14 @@ gheatmap <- function(p, data, offset = 0, width = 1, low = "green", high = "blue
     ymapping[[".panel"]] <- factor("Tree")
     p2 <- p2 + geom_text(data = mapping, aes(x = to, y = y, label = from), size = font.size, inherit.aes = FALSE,
                          angle = colnames_angle, nudge_x = offset_x, nudge_y = offset_y,
-                         hjust = 0.5, vjust  = 1) +
+                         hjust = 1, vjust  = 0.5) +
       geom_text(data = ymapping, aes(x = x, y = to, label = from), size = font.size, inherit.aes = FALSE,
                 angle = rownames_angle, nudge_x = offset_x, nudge_y = offset_y, hjust = 0, vjust = 0.5)
   }
   else {
     p2 <- p2 + geom_text(data = mapping, aes(x = to, y = y, label = from), size = font.size, inherit.aes = FALSE,
                          angle = colnames_angle, nudge_x = offset_x, nudge_y = offset_y,
-                         hjust = 0.5, vjust  = 1)
+                         hjust = 1, vjust  = 0.5)
   }
   p2 <- p2 + theme(legend.position = "right")
   ## p2 <- p2 + guides(fill = guide_legend(override.aes = list(colour = NULL)))
