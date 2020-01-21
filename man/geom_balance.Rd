@@ -4,8 +4,14 @@
 \alias{geom_balance}
 \title{geom_balance}
 \usage{
-geom_balance(node, fill = "steelblue", color = "white", alpha = 0.5,
-  extend = 0, extendto = NULL)
+geom_balance(
+  node,
+  fill = "steelblue",
+  color = "white",
+  alpha = 0.5,
+  extend = 0,
+  extendto = NULL
+)
 }
 \arguments{
 \item{node}{selected node (balance) to highlight}
@@ -32,7 +38,7 @@ correspond to multichotomies will not be displayed.
 }
 \references{
 J. Silverman, et al. \emph{A phylogenetic transform enhances
-  analysis of compositional microbiota data}. (in preparation)
+analysis of compositional microbiota data}. (in preparation)
 }
 \author{
 Justin Silverman and modified by Guangchuang Yu

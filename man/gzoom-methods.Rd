@@ -10,14 +10,11 @@
 \usage{
 gzoom(object, focus, subtree = FALSE, widths = c(0.3, 0.7), ...)
 
-\S4method{gzoom}{ggtree}(object, focus, widths = c(0.3, 0.7),
-  xmax_adjust = 0)
+\S4method{gzoom}{ggtree}(object, focus, widths = c(0.3, 0.7), xmax_adjust = 0)
 
-\S4method{gzoom}{treedata}(object, focus, subtree = FALSE,
-  widths = c(0.3, 0.7))
+\S4method{gzoom}{treedata}(object, focus, subtree = FALSE, widths = c(0.3, 0.7))
 
-\S4method{gzoom}{phylo}(object, focus, subtree = FALSE, widths = c(0.3,
-  0.7))
+\S4method{gzoom}{phylo}(object, focus, subtree = FALSE, widths = c(0.3, 0.7))
 }
 \arguments{
 \item{object}{supported tree objects}
@@ -30,7 +27,7 @@ gzoom(object, focus, subtree = FALSE, widths = c(0.3, 0.7), ...)
 
 \item{...}{additional parameter}
 
-\item{xmax_adjust}{adjust xmax (xlim[2])}
+\item{xmax_adjust}{adjust xmax (\code{xlim[2]})}
 }
 \value{
 figure

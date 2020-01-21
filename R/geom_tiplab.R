@@ -31,7 +31,7 @@ geom_tiplab <- function(mapping=NULL, hjust = 0,  align = FALSE, linetype = "dot
               class = "tiplab")
 }
 
-geom_tiplab_rectangular <- function(mapping=NULL, hjust = 0,  align = FALSE, linetype = "dotted", linesize=0.5, geom="text",  offset=0, ...) {
+geom_tiplab_rectangular <- function(mapping=NULL, hjust = 0,  align = FALSE, linetype = "dotted", linesize=0.5, geom="text",  offset=0, fontface = "plain", ...) {
     geom <- match.arg(geom, c("text", "label", "image", "phylopic"))
     if (geom == "text") {
         label_geom <- geom_text2
@@ -46,10 +46,12 @@ geom_tiplab_rectangular <- function(mapping=NULL, hjust = 0,  align = FALSE, lin
 
     x <- y <- label <- isTip <- node <- NULL
     if (align == TRUE) {
-        self_mapping <- aes(x = max(x, na.rm=TRUE) + diff(range(x, na.rm=TRUE))/200, y = y, label = label, node = node, subset = isTip)
+        self_mapping <- aes(x = max(x, na.rm=TRUE) + diff(range(x, na.rm=TRUE))/200, y = y,
+                            label = label, node = node, subset = isTip)
     }
     else {
-        self_mapping <- aes(x = x + diff(range(x, na.rm=TRUE))/200, y= y, label = label, node = node, subset = isTip)
+        self_mapping <- aes(x = x + diff(range(x, na.rm=TRUE))/200, y= y,
+                            label = label, node = node, subset = isTip)
     }
 
     if (is.null(mapping)) {
@@ -78,9 +80,13 @@ geom_tiplab_rectangular <- function(mapping=NULL, hjust = 0,  align = FALSE, lin
                           linetype = linetype, nudge_x = offset,
                           size = linesize, stat = StatTreeData, ...)
        ,
-        label_geom(mapping=text_mapping,
-                   hjust = hjust, nudge_x = offset, stat = StatTreeData, ...)
-
+        if (geom %in% c("image", "phylopic")) {
+            label_geom(mapping=text_mapping,
+                       hjust = hjust, nudge_x = offset, stat = StatTreeData, ...)            
+        } else {
+            label_geom(mapping=text_mapping,
+                       hjust = hjust, nudge_x = offset, stat = StatTreeData, fontface = fontface, ...)
+        }
     )
 }
 
@@ -95,8 +101,8 @@ geom_tiplab_rectangular <- function(mapping=NULL, hjust = 0,  align = FALSE, lin
 ##' @return tip label layer
 ##' @export
 ##' @author Guangchuang Yu
-##' @references \url{https://groups.google.com/forum/#!topic/bioc-ggtree/o35PV3iHO-0}
-##' @seealso \link{geom_tiplab}
+##' @references <https://groups.google.com/forum/#!topic/bioc-ggtree/o35PV3iHO-0>
+##' @seealso [geom_tiplab]
 geom_tiplab2 <- function(mapping=NULL, hjust=0, ...) {
     angle <- isTip <- node <- NULL
     m1 <- aes(subset=(isTip & (angle < 90 | angle > 270)), angle=angle, node = node)

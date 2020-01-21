@@ -20,6 +20,62 @@ ggplot_add.facet_xlim <- function(object, plot, object_name) {
     ggplot_add(obj, plot, object_name)
 }
 
+
+##' @method ggplot_add axisAlign
+##' @importFrom ggplot2 scale_x_discrete
+##' @importFrom ggplot2 scale_y_discrete
+##' @export
+ggplot_add.axisAlign <- function(object, plot, object_name) {
+    limits <- object$limits
+
+    ## expand_limits <- object$expand_limits
+    ## limits[1] <- limits[1] + (limits[1] * expand_limits[1]) - expand_limits[2]
+    ## limits[2] <- limits[2] + (limits[2] * expand_limits[3]) + expand_limits[4]
+
+    if (is.numeric(limits)) {
+        lim_x <- scale_x_continuous(limits=limits, expand=c(0,0))
+        lim_y <- scale_y_continuous(limits = limits, expand = c(0, 0))
+    } else {
+        lim_x <- scale_x_discrete(limits=limits, expand = c(0, 0.6))
+        lim_y <- scale_y_discrete(limits = limits, expand = c(0, 0.6))
+    }
+
+    if (object$axis == 'x') {
+        ## if (object$by == "x") {
+        if (is(plot$coordinates, "CoordFlip")) {
+            message("the plot was flipped and the x limits will be applied to y-axis")
+            scale_lim <- lim_y
+        } else {
+            scale_lim <- lim_x
+        }
+        ## } else {
+        ##     if (is(plot$coordinates, "CoordFlip")) {
+        ##         message("the plot was flipped and the x limits will be applied to x-axis")
+        ##         scale_lim <- scale_x_continuous(limits=limits, expand=c(0,0))
+        ##     } else {
+        ##         scale_lim <- scale_y_continuous(limits=limits, expand=c(0,0))
+        ##     }
+        ## }
+    } else { ## axis == 'y'
+        ## if (object$by == "x") {
+        ##     if (is(plot$coordinates, "CoordFlip")) {
+        ##         message("the plot was flipped and the y limits will be applied to y-axis")
+        ##         scale_lim <- scale_y_continuous(limits = limits, expand = c(0, 0))
+        ##     } else {
+        ##         scale_lim <- scale_x_continuous(limits = limits, expand = c(0, 0))
+        ##     }
+        ## } else {
+        if (is(plot$coordinates, "CoordFlip")) {
+            message("the plot was flipped and the y limits will be applied to x-axis")
+            scale_lim <- lim_x
+        } else {
+            scale_lim <- lim_y
+        }
+        ## }
+    }
+    ggplot_add(scale_lim, plot, object_name)
+}
+
 ##' @method ggplot_add geom_range
 ##' @export
 ggplot_add.geom_range <- function(object, plot, object_name) {
@@ -30,6 +86,7 @@ ggplot_add.geom_range <- function(object, plot, object_name) {
 }
 
 ##' @method ggplot_add layout_ggtree
+##' @importFrom ggplot2 expand_scale
 ##' @export
 ggplot_add.layout_ggtree <- function(object, plot, object_name) {
     if(object$layout == 'fan') {
@@ -42,9 +99,13 @@ ggplot_add.layout_ggtree <- function(object, plot, object_name) {
                     coord_flip(clip = 'off')
                     )
     } else if (object$layout == 'circular') {
-        obj <- coord_polar(theta='y', start=-pi/2, -1)
+        ## refer to: https://github.com/GuangchuangYu/ggtree/issues/6
+        ## and also have some space for tree scale (legend)
+        obj <- list(coord_polar(theta='y', start=-pi/2, -1, clip = 'off'),
+                    scale_y_continuous(limits = c(0, NA), expand = expand_scale(0, 0.6))
+                    )
     } else { ## rectangular
-        obj <- coord_cartesian()
+        obj <- coord_cartesian(clip = 'off')
     }
     assign("layout", object$layout, envir = plot$plot_env)
     ggplot_add(obj, plot, object_name)
@@ -122,6 +183,10 @@ ggplot_add.hilight <- function(object, plot, object_name) {
     ## if the plot was not produce by ggtree, but ggplot
     ## instead of the tree layout, you may get graphics::layout
     if (!is.character(layout)) layout <- 'rectangular'
+
+    if ("branch.length" %in% colnames(plot$data)) {
+        object$mapping <- aes_(branch.length = ~branch.length)
+    }
 
     if (layout == "unrooted" || layout == "daylight") {
         ly <- do.call(geom_hilight_encircle, object)

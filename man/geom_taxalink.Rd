@@ -4,8 +4,14 @@
 \alias{geom_taxalink}
 \title{geom_taxalink}
 \usage{
-geom_taxalink(taxa1, taxa2, curvature = 0.5, arrow = NULL,
-  arrow.fill = NULL, ...)
+geom_taxalink(
+  taxa1,
+  taxa2,
+  curvature = 0.5,
+  arrow = NULL,
+  arrow.fill = NULL,
+  ...
+)
 }
 \arguments{
 \item{taxa1}{taxa1, can be label or node number}
@@ -18,7 +24,7 @@ positive values produce right-hand curves, and zero produces a straight line.}
 
 \item{arrow}{specification for arrow heads, as created by arrow().}
 
-\item{arrow.fill}{fill color to usse for the arrow head (if closed). `NULL` means use `colour` aesthetic.}
+\item{arrow.fill}{fill color to usse for the arrow head (if closed). \code{NULL} means use \code{colour} aesthetic.}
 
 \item{...}{additional parameter}
 }

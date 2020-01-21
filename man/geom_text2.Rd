@@ -4,10 +4,21 @@
 \alias{geom_text2}
 \title{geom_text2}
 \usage{
-geom_text2(mapping = NULL, data = NULL, ..., stat = "identity",
-  position = "identity", family = "sans", parse = FALSE,
-  na.rm = TRUE, show.legend = NA, inherit.aes = TRUE, nudge_x = 0,
-  nudge_y = 0, check_overlap = FALSE)
+geom_text2(
+  mapping = NULL,
+  data = NULL,
+  ...,
+  stat = "identity",
+  position = "identity",
+  family = "sans",
+  parse = FALSE,
+  na.rm = TRUE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  nudge_x = 0,
+  nudge_y = 0,
+  check_overlap = FALSE
+)
 }
 \arguments{
 \item{mapping}{the aesthetic mapping}
@@ -44,7 +55,7 @@ text layer
 geom_text2 support aes(subset) via setup_data
 }
 \seealso{
-\link[ggplot2]{geom_text}
+\link[ggplot2:geom_text]{geom_text}
 }
 \author{
 Guangchuang Yu

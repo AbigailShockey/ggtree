@@ -59,18 +59,27 @@ biocinit:
 	git remote add upstream git@git.bioconductor.org:packages/$(PKGNAME).git;\
 	git fetch --all
 
+giteeinit:
+	git remote add gitee git@gitee.com:GuangchuangYu/ggtree.git;\
+	git fetch --all
+
+rmoldrelease:
+	git branch -D RELEASE_3_9
+
 release:
-	git checkout RELEASE_3_9;\
+	git checkout RELEASE_3_10;\
 	git fetch --all
 
 update:
 	git fetch --all;\
 	git checkout master;\
 	git merge upstream/master;\
+	git merge gitee/master;\
 	git merge origin/master
 
 push:
 	git push upstream master;\
+	git push gitee master;\
 	git push origin master
 
 

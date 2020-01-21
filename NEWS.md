@@ -1,5 +1,27 @@
+# ggtree 2.1.1
+
++ export `geom_highlight` as an alias of `geom_hilight` (2020-01-08, Wed)
++ set `clip="off"` for all layouts (2019-12-06, Fri)
++ not passing `fontface` if `geom` is `image` or `phylopic` in `geom_tiplab` and `geom_nodelab` (2019-11-29, Fri)
++ import and re-export `guide_legend`, `scale_colour_manual`, `scale_color_manual`, `scale_fill_manual` and `margin` from `ggplot2`
++ `offspring` method for `ggtree` object (2019-11-21, Thu)
++ fixed `revts` to work with `collapse` (2019-11-18, Mon)
++ convert roxygen documents using markdown (2019-11-01, Fri)
++ extend `xlim2` and `ylim2` to support discrete scale.
++ `xlim2` and `ylim2` to uniformize axis limits of ggplot objects (2019-10-31, Thu)
+  - <https://yulab-smu.github.io/treedata-book/chapter7.html#composite_plot>
+  - <https://yulab-smu.github.io/treedata-book/docs/chapter10.html#axis_align>
++ fixed `fontface` warning message when `align=TRUE` in `geom_tiplab` (2019-10-30, Wed)
+  - <https://github.com/YuLab-SMU/ggtree/issues/260>
+
+# ggtree 2.0.0
+
++ Bioconductor 3.10 release (2019-10-30, Wed)
+
 # ggtree 1.99.1
 
++ bug fixed of `geom_hilight` for `tree$edge.length = NULL` (2019-10-16, Wed)
+  - <https://groups.google.com/d/msg/bioc-ggtree/GULj-eoAluI/Llpm-HbfCwAJ>
 + `fortify` method for igraph (only work with tree graph) (2019-09-28, Sat)
 + `ggdensitree` (2019-09-11, Wed)
   - <https://github.com/YuLab-SMU/ggtree/pull/253>

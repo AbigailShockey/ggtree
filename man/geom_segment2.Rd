@@ -4,10 +4,20 @@
 \alias{geom_segment2}
 \title{geom_segment2}
 \usage{
-geom_segment2(mapping = NULL, data = NULL, stat = "identity",
-  position = "identity", lineend = "butt", na.rm = FALSE,
-  show.legend = NA, inherit.aes = TRUE, nudge_x = 0, arrow = NULL,
-  arrow.fill = NULL, ...)
+geom_segment2(
+  mapping = NULL,
+  data = NULL,
+  stat = "identity",
+  position = "identity",
+  lineend = "butt",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  nudge_x = 0,
+  arrow = NULL,
+  arrow.fill = NULL,
+  ...
+)
 }
 \arguments{
 \item{mapping}{aes mapping}
@@ -30,7 +40,7 @@ geom_segment2(mapping = NULL, data = NULL, stat = "identity",
 
 \item{arrow}{specification for arrow heads, as created by arrow().}
 
-\item{arrow.fill}{fill color to usse for the arrow head (if closed). `NULL` means use `colour` aesthetic.}
+\item{arrow.fill}{fill color to usse for the arrow head (if closed). \code{NULL} means use \code{colour} aesthetic.}
 
 \item{...}{additional parameter}
 }
@@ -41,7 +51,7 @@ add segment layer
 geom_segment2 support aes(subset) via setup_data
 }
 \seealso{
-\link[ggplot2]{geom_segment}
+\link[ggplot2:geom_segment]{geom_segment}
 }
 \author{
 Guangchuang Yu

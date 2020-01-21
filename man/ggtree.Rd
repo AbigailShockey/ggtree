@@ -4,14 +4,24 @@
 \name{ggtree}
 \alias{ggtree}
 \alias{package-ggtree}
-\alias{ggtree-package}
 \title{visualizing phylogenetic tree and heterogenous associated data based on grammar of graphics
 \code{ggtree} provides functions for visualizing phylogenetic tree and its associated data in R.}
 \usage{
-ggtree(tr, mapping = NULL, layout = "rectangular", open.angle = 0,
-  mrsd = NULL, as.Date = FALSE, yscale = "none",
-  yscale_mapping = NULL, ladderize = TRUE, right = FALSE,
-  branch.length = "branch.length", root.position = 0, ...)
+ggtree(
+  tr,
+  mapping = NULL,
+  layout = "rectangular",
+  open.angle = 0,
+  mrsd = NULL,
+  as.Date = FALSE,
+  yscale = "none",
+  yscale_mapping = NULL,
+  ladderize = TRUE,
+  right = FALSE,
+  branch.length = "branch.length",
+  root.position = 0,
+  ...
+)
 }
 \arguments{
 \item{tr}{phylo object}
@@ -34,7 +44,7 @@ ggtree(tr, mapping = NULL, layout = "rectangular", open.angle = 0,
 aspect?}
 
 \item{right}{logical. If \code{ladderize = TRUE}, should the ladder have the smallest clade on the
-right-hand side? See \code{\link[ape]{ladderize}} for more information.}
+right-hand side? See \code{\link[ape:ladderize]{ape::ladderize()}} for more information.}
 
 \item{branch.length}{variable for scaling branch, if 'none' draw cladogram}
 
@@ -54,12 +64,23 @@ Methods in Ecology and Evolution 2017, 8(1):28-36, doi:10.1111/2041-210X.12628
 drawing phylogenetic tree from phylo object
 }
 \examples{
-require(ape)
+require(ape) 
 tr <- rtree(10)
 ggtree(tr)
 }
+\references{
+\enumerate{
+\item G Yu, TTY Lam, H Zhu, Y Guan (2018). Two methods for mapping and visualizing associated data
+on phylogeny using ggtree. Molecular Biology and Evolution, 35(2):3041-3043.
+\url{https://doi.org/10.1093/molbev/msy194}
+\item G Yu, DK Smith, H Zhu, Y Guan, TTY Lam (2017). ggtree: an R package for
+visualization and annotation of phylogenetic trees with their covariates and
+other associated data. Methods in Ecology and Evolution, 8(1):28-36.
+\url{https://doi.org/10.1111/2041-210X.12628}
+}
+}
 \seealso{
-\code{\link[ape]{ladderize}}
+\code{\link[ape:ladderize]{ape::ladderize()}}
 }
 \author{
 Yu Guangchuang
