@@ -26,7 +26,8 @@
 
 gheatmap <- function(p, data, offset = 0, width = 1, low = "green", high = "blue", color = "white", colnames = TRUE,
                      colnames_position = "bottom", colnames_angle = 90, rownames_angle = 0, colnames_level = NULL,
-                     colnames_offset_x = 0, colnames_offset_y = 0, rownames_offset_x = 0, rownames_offset_y = 0, font.size = 4, hjust=0.5, legend_title = "value", rownames = TRUE, cell_labels = TRUE, cell_font_size = 2) {
+                     colnames_offset_x = 0, colnames_offset_y = 0, rownames_offset_x = 0, rownames_offset_y = 0, 
+                     font.size = 4, hjust=0.5, legend_title = "value", rownames = TRUE, cell_labels = TRUE, cell_font_size = 2) {
 
     colnames_position %<>% match.arg(c("bottom", "top"))
     variable <- value <- lab <- y <- NULL
@@ -115,7 +116,7 @@ gheatmap <- function(p, data, offset = 0, width = 1, low = "green", high = "blue
                              angle=colnames_angle, nudge_x=colnames_offset_x, nudge_y = colnames_offset_y, hjust = hjust)
     }
   
-    if (isTRUE(rownames)) {
+    if (rownames) {
         ystart <- 0
         V3 <- ystart + as.numeric(dd$variable) * 1
         ymapping <- data.frame(from = dd$variable, to = V3)
