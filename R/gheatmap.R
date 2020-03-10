@@ -104,6 +104,14 @@ gheatmap <- function(p, data, offset = 0, width = 1, low = "green", high = "blue
     } else {
         p2 <- p2 + scale_fill_discrete(na.value=NA, name = legend_title) #"white")
     }
+    if (is(dd$value,"numeric") & isTRUE(cell_labels)) {
+      dd$clr <- NA
+      dd$clr[which(dd$value < (max(dd$value)/2) & dd$value > 0)] <- "white"
+      dd$clr[which(dd$value >= (max(dd$value)/2))] <- "black"
+      dd$clr[which(dd$value  ==  0)] <- "black"
+      p2 <- p2 + geom_text(data = dd, aes(label = value,color = factor(clr)), size = cell_font_size) +
+        scale_color_manual(values = c("black", "white"), guide = FALSE)
+    }
     if (colnames) {
         if (colnames_position == "bottom") {
             y <- 0
