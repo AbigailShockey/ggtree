@@ -22,12 +22,16 @@
 ##' @param legend_title title of fill legend
 ##' @param cell_labels logical, add matrix cell labels or not
 ##' @param cell_font_size, font size of matrix cell labels
+##' @param lower_font_color color of lower half of cell values
+##' @param upper_font_color color of upper half of cell values
+##' @param zero_font_color color of cell values equal to 0
 ##' @param rownames logical, add matrix rownames or not
 
 gheatmap <- function(p, data, offset = 0, width = 1, low = "green", high = "blue", color = "white", colnames = TRUE,
                      colnames_position = "bottom", colnames_angle = 90, rownames_angle = 0, colnames_level = NULL,
                      colnames_offset_x = 0, colnames_offset_y = 0, rownames_offset_x = 0, rownames_offset_y = 0, 
-                     font.size = 4, hjust=0.5, legend_title = "value", rownames = TRUE, cell_labels = TRUE, cell_font_size = 2) {
+                     font.size = 4, hjust=0.5, legend_title = "value", rownames = TRUE, cell_labels = TRUE, 
+                     cell_font_size = 2, lower_font_color = "white", upper_font_color = "black") {
 
     colnames_position %<>% match.arg(c("bottom", "top"))
     variable <- value <- lab <- y <- NULL
@@ -106,11 +110,11 @@ gheatmap <- function(p, data, offset = 0, width = 1, low = "green", high = "blue
     }
     if (is(dd$value,"numeric") & isTRUE(cell_labels)) {
       dd$clr <- NA
-      dd$clr[which(dd$value < (max(dd$value)/2) & dd$value > 0)] <- "white"
-      dd$clr[which(dd$value >= (max(dd$value)/2))] <- "black"
-      dd$clr[which(dd$value  ==  0)] <- "black"
+      dd$clr[which(dd$value < (max(dd$value)/2) & dd$value > 0)] <- lower_font_color
+      dd$clr[which(dd$value >= (max(dd$value)/2))] <- upper_font_color
+      dd$clr[which(dd$value  ==  0)] <- upper_font_color
       p2 <- p2 + geom_text(data = dd, aes(label = value,color = factor(clr)), size = cell_font_size) +
-        scale_color_manual(values = c("black", "white"), guide = FALSE)
+        scale_color_manual(values = c(upper_font_color, lower_font_color), guide = FALSE)
     }
     if (colnames) {
         if (colnames_position == "bottom") {
